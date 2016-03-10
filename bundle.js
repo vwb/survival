@@ -208,10 +208,12 @@
 	};
 
 	Game.prototype.randomPosition = function () {
-
+	  var center = [this.dimX / 2, this.dimY / 2]
 	  var x = (Math.random() * this.dimX);
 	  var y = (Math.random() * this.dimY);
-
+	  if ((Math.abs(center[0] - x) < 50) && Math.abs(center[1] - y) < 50){
+	    return this.randomPosition();
+	  }
 	  return [x,y];
 	};
 
@@ -344,8 +346,10 @@
 
 		if (!radius){
 
-			if (rand < 5){
+			if (rand < 10 && rand > 3){
 				var radius = (Math.random() * 5) + 15
+			} else if (rand < 2){
+				var radius = (Math.random() * 10) + 20
 			} else {
 				var radius = (Math.random() * 4) + 1
 			}
