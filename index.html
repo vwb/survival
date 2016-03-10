@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title>Survival</title>
+    <link rel="stylesheet" href="./style.css">
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet' type='text/css'>
+
+  </head>
+  <body>
+
+    <div id="game">
+
+      <section class="info-wrapper group center" id="info">
+        <div class="circle-wrapper">
+
+          <div class="info" id="new-game">
+            <h2> SURVIVOR </h2>
+            <p> Press space to play </p>
+          </div>
+
+          <div class="info gone" id="lost-game">
+            <h2> Absorbed </h2>
+            <p> Better luck next time </p>
+            <p> Press space to try again </p>
+          </div>
+
+          <div  class="info gone" id="win-game">
+            <h2> Dominant Lifeform </h2>
+            <p> You own this ecosystem </p>
+            <p> Press space to play again </p>
+          </div>
+
+        </div>
+      </section> 
+
+      <canvas id="world" class="hidden"></canvas>
+
+      <div class="footer gone" id="footer"> 
+        <div> SURVIVOR </div>
+        <div> use arrow keys or w-a-s-d to move </div>
+      </div>
+
+    </div>
+
+    <script type="application/javascript" src="keymaster.js"></script>
+    <script src="bundle.js"></script>
+
+  </body>
+    <script>
+      window.scrollTo(0,document.body.scrollHeight);
+    </script>
+</html>
