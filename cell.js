@@ -16,8 +16,8 @@ var Cell = function(pos, game, radius, vec){
 
 	if (!radius){
 
-		if (rand < 10 && rand > 3){
-			var radius = (Math.random() * 5) + 15
+		if (rand < 9 && rand > 3){
+			var radius = (Math.random() * 5) + 10
 		} else if (rand < 2){
 			var radius = (Math.random() * 10) + 20
 		} else {
