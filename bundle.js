@@ -208,10 +208,12 @@
 	};
 
 	Game.prototype.randomPosition = function () {
-
+	  var center = [this.dimX / 2, this.dimY / 2]
 	  var x = (Math.random() * this.dimX);
 	  var y = (Math.random() * this.dimY);
-
+	  if ((Math.abs(center[0] - x) < 75) && Math.abs(center[1] - y) < 75){
+	    return this.randomPosition();
+	  }
 	  return [x,y];
 	};
 
@@ -344,8 +346,10 @@
 
 		if (!radius){
 
-			if (rand < 5){
-				var radius = (Math.random() * 5) + 15
+			if (rand < 9 && rand > 3){
+				var radius = (Math.random() * 5) + 10
+			} else if (rand < 1.5){
+				var radius = (Math.random() * 10) + 30
 			} else {
 				var radius = (Math.random() * 4) + 1
 			}
@@ -496,7 +500,7 @@
 	var util = new Util();
 
 	var COLOR = "#5BD9ED";
-	var RADIUS = 6;
+	var RADIUS = 7.5;
 	var VEL = [0,0];
 
 	function PlayerCell(pos, game){

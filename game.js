@@ -32,10 +32,12 @@ Game.prototype.addcells = function (pos, vel, radius) {
 };
 
 Game.prototype.randomPosition = function () {
-
+  var center = [this.dimX / 2, this.dimY / 2]
   var x = (Math.random() * this.dimX);
   var y = (Math.random() * this.dimY);
-
+  if ((Math.abs(center[0] - x) < 75) && Math.abs(center[1] - y) < 75){
+    return this.randomPosition();
+  }
   return [x,y];
 };
 

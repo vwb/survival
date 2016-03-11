@@ -3,7 +3,7 @@ var Util = require('./utils.js');
 var util = new Util();
 
 var COLOR = "#5BD9ED";
-var RADIUS = 6;
+var RADIUS = 7.5;
 var VEL = [0,0];
 
 function PlayerCell(pos, game){
