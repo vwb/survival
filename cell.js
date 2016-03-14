@@ -12,11 +12,11 @@ var Cell = function(pos, game, radius, vec){
 		var vec = util.randomVec(((Math.random() * 0.3) + 0.001));
 	}
 
-	var rand = (Math.random() * 100)
+	var rand = (Math.random() * 120)
 
 	if (!radius){
 
-		if (rand < 9 && rand > 3){
+		if (rand < 12 && rand > 3){
 			var radius = (Math.random() * 5) + 10
 		} else if (rand < 1.5){
 			var radius = (Math.random() * 10) + 30
