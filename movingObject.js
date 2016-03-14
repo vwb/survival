@@ -76,10 +76,8 @@ MovingObject.prototype.checkOutOfBounds = function(pos) {
 MovingObject.prototype.collidedWith = function (other) {
 
 
-  
+  var ratio = 1;
   if (this.radius > other.radius) {
-
-    var ratio = (other.radius / this.radius) > 1 ? (other.radius / this.radius) : 1
     this.radius += ratio/2
     other.radius -= ratio
 
@@ -88,7 +86,6 @@ MovingObject.prototype.collidedWith = function (other) {
     }
 
   } else {
-    var ratio = (this.radius / other.radius) > 1 ? (this.radius / other.radius) : 1
     this.radius -= ratio
     other.radius += ratio/2
 
