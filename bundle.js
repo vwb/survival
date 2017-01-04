@@ -539,7 +539,7 @@
 	};
 
 	PlayerCell.prototype.playSound = function () {
-		if(!SOUND.paused){
+		if (!SOUND.paused) {
 			SOUND.pause();
   			SOUND.currentTime = 0;
   			SOUND.play();
