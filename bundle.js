@@ -164,7 +164,10 @@
 
 	  Object.keys(GameView.MOVES).forEach(function (k) {
 	    var move = GameView.MOVES[k];
-	    key(k, function () { playerCell.power(move); console.log("this is the move"+move)});
+	    key(k, function () { 
+	    	playerCell.power(move); 
+	    	playerCell.playSound();
+	    });
 	  });
 
 	};
@@ -504,6 +507,8 @@
 	var COLOR = "#5BD9ED";
 	var RADIUS = 7.5;
 	var VEL = [0,0];
+	var SOUND = new Audio("assets/sound-effects/blop.wav");
+	SOUND.volume = .25;
 
 	function PlayerCell(pos, game){
 		var vel = util.randomVec((Math.random() * 0.1))
@@ -533,6 +538,16 @@
 	  this.game.renderCell(cellOptions);
 	};
 
+	PlayerCell.prototype.playSound = function () {
+		if(!SOUND.paused){
+			SOUND.pause();
+  			SOUND.currentTime = 0;
+  			SOUND.play();
+  		} else {
+  			SOUND.play();
+  		}
+	};
+
 	PlayerCell.prototype.renderCounterWeightPos = function(saveRadius, impulse) {
 		var result = [];
 
@@ -544,10 +559,6 @@
 
 		var XOffset = -1 * ((velX/(Math.abs(velX)+Math.abs(velY)))) * (saveRadius + (saveRadius / 2.5) );
 		var YOffset = -1 * ((velY/(Math.abs(velX)+Math.abs(velY)))) * (saveRadius + (saveRadius / 2.5) );
-
-		console.log("radius:" + this.radius)
-		console.log("xOffset:" + XOffset)
-		console.log("YOffset:" + YOffset)
 
 		var xPos = this.pos[0] + XOffset
 		var yPos = this.pos[1] + YOffset
