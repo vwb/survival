@@ -44,11 +44,20 @@ html, body, canvas, h1, h2, h3, h4, h5 {
 	text-align: center;
 }
 
+.left {
+    margin: 0 auto;
+    text-align: left;
+}
+
 
 #game {
 	position: relative;
 	height: 100%;
 	width: 100%;
+}
+
+#multiplayer {
+    font-size: 14px;
 }
 
 .info-wrapper {
@@ -67,6 +76,15 @@ html, body, canvas, h1, h2, h3, h4, h5 {
 	background-color: black;
 	margin: 15% auto 0 auto;
 	overflow: wrap;
+}
+
+.sm-circle-wrapper {
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    background-color: black;
+    margin: 0% auto 0 auto;
+    overflow: wrap;
 }
 
 .info {
