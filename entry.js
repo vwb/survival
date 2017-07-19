@@ -1,6 +1,5 @@
 window.GameView = require('./gameView.js');
 
-
 var canvasEl = document.getElementById("world");
 
 canvasEl.height = window.innerHeight;
@@ -24,13 +23,10 @@ el.addEventListener("keydown", function() {
         //standard game
         removeMenu();
 		gameView.start(ctx);
-	} else if (event.which === 72 && !gameView.inProgress) {
-        //player wants to host a multiplayer game, register websockets here
+	} else if (event.which === 77 && !gameView.inProgress) {
+        //player wants to run a multiplayer game, register websockets here
         removeMenu();
-        gameView.start(ctx);
-    } else if (event.which === 74 && !gameView.inProgress) {
-        //player wants to join an existing game, register websockets here
-        removeMenu();
+        registerWebsocket();
         gameView.start(ctx);
     }
 });
@@ -44,3 +40,20 @@ function removeMenu() {
     toolTip.className = "gone"
 }
 
+function registerWebsocket() {
+    var connection = new WebSocket('ws://localhost:8080');
+
+    connection.onopen = function () {
+      console.log("opened");
+    };
+
+    // Log errors
+    connection.onerror = function (error) {
+      console.error('WebSocket Error ' + error);
+    };
+
+    // Log messages from the server
+    connection.onmessage = function (e) {
+        console.log(e.data);
+    };
+}

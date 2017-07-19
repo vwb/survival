@@ -1,0 +1,24 @@
+{
+  "name": "survival",
+  "version": "1.0.0",
+  "description": "survival game",
+  "main": "bundle.js",
+  "dependencies": {
+    "ws": "^3.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "webpack ./entry.js bundle.js && node server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonk1993/survival.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonk1993/survival/issues"
+  },
+  "homepage": "https://github.com/jonk1993/survival#readme"
+}
