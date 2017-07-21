@@ -7,6 +7,7 @@ const CONNECTION = 'connection';
 const NEW_PLAYER = 'new player';
 const DISCONNECT = 'disconnect';
 const MOVE_PLAYER = 'move player';
+const REMOVE_PLAYER = 'remove player';
 
 var players = [];
 
@@ -25,6 +26,15 @@ function onSocketConnection(client) {
 
 function onClientDisconnect() {
     util.log("Aw player has disconnected: " + this.id);
+    var playerToRemove = getPlayerById(this.id);
+
+    if (!playerToRemove) {
+        util.log("Merr no player to remove :(");
+        return;
+    }
+
+    players.splice(players.indexOf(playerToRemove), 1);
+    this.broadcast.emit(REMOVE_PLAYER, {id: this.id});
 };
 
 function onNewPlayer(data) {
@@ -45,3 +55,12 @@ function onNewPlayer(data) {
 };
 
 function onMovePlayer(data) {};
+
+function getPlayerById(id) {
+    for (var i = 0; i < players.length; i++) {
+        if (players[i].id == id) {
+            return players[i];
+        }
+    }
+    return false;
+};

@@ -592,7 +592,6 @@ Game.prototype.getSocket = function () {
       var newPlayer = new PlayerCell(data.pos, this);
       newPlayer.setId(data.id);
       that.remotePlayers.push(newPlayer);
-      console.log(that.remotePlayers);
     });
 
     socket.on(MOVE_PLAYER, function(data) {
@@ -600,13 +599,27 @@ Game.prototype.getSocket = function () {
     });
 
     socket.on(REMOVE_PLAYER, function(data) {
+      var playerToRemove;
+      for (var i = 0; i < that.remotePlayers.length; i++) {
+        if (that.remotePlayers[i].id == data.id) {
+          playerToRemove = that.remotePlayers[i];
+        }
+      }
 
+      if (!playerToRemove) {
+        console.log("Player not found: "+ data.id);
+        return;
+      }
+
+      that.remotePlayers.splice(that.remotePlayers.indexOf(playerToRemove), 1);
     });
 }
 
 function randomIntFromInterval(min, max) {
     return Math.floor(Math.random()*(max-min+1)+min);
 };
+
+
 
 module.exports = Game;
 
