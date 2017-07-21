@@ -3,13 +3,15 @@ var Cell = require('./cell.js');
 var PlayerCell = require('./playerCell.js');
 var GameView = require('./gameView.js');
 
+var util = new Util();
 var NUM_CELLS = 300;
 
-function Game(dimX, dimY){
+function Game(dimX, dimY, multiplayer){
 
   this.cells = [];
   this.dimY = dimY;
   this.dimX = dimX;
+  this.multiplayer = multiplayer;
   var playerCellPos = [(dimX / 2), (dimY / 2)]
   this.playerCell = new PlayerCell(playerCellPos, this);
 
@@ -18,6 +20,10 @@ function Game(dimX, dimY){
   }
 
   this.allObjects = [this.playerCell].concat(this.cells);
+
+  if (this.multiplayer) {
+    this.socket = util.getSocket();
+  }
 }
 
 Game.prototype.addcells = function (pos, vel, radius) {

@@ -67,6 +67,12 @@
 /* 0 */
 /***/ (function(module, exports) {
 
+const CONNECT = 'connect'; 
+const DISCONNECT = 'disconnect';
+const NEW_PLAYER = 'new player';
+const MOVE_PLAYER = 'move player';
+const REMOVE_PLAYER = 'remove player';
+
 function Util(){}
 
 Util.prototype.inherits = function (SuperClass, SubClass) {
@@ -95,6 +101,35 @@ Util.prototype.randomVec = function (length) {
   return [x,y];
 };
 
+Util.prototype.getSocket = function () {
+    var socket = io.connect('http://localhost:8080');
+    socket.on(CONNECT, onSocketConnected);
+    socket.on(DISCONNECT, onSocketDisconnect);
+    socket.on(NEW_PLAYER, onNewPlayer);
+    socket.on(MOVE_PLAYER, onMovePlayer);
+    socket.on(REMOVE_PLAYER, onRemovePlayer);
+}
+
+function onSocketConnected() {
+    console.log("Connected to socket server");
+};
+
+function onSocketDisconnect() {
+    console.log("Disconnected from socket server");
+};
+
+function onNewPlayer(data) {
+    console.log("New player connected: " + data.id);
+};
+
+function onMovePlayer(data) {
+
+};
+
+function onRemovePlayer(data) {
+
+};
+
 module.exports = Util;
 
 
@@ -102,6 +137,8 @@ module.exports = Util;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
+/* This handles creating the Game Object, set the interval to step the game every 20 ms, 
+and display correct divs once game over. */
 var Game = __webpack_require__(5);
 
 function GameView(dimY, dimX){
@@ -111,9 +148,9 @@ function GameView(dimY, dimX){
   this.firstOpen = false;
 }
 
-GameView.prototype.start = function (ctx) {
+GameView.prototype.start = function (ctx, multiplayer = false) {
 
-  this.game = new Game(this.dimY, this.dimX);
+  this.game = new Game(this.dimY, this.dimX, multiplayer);
   this.playerCell = this.game.playerCell;
   // this.playerCell.vel = [0,0]
   this.inProgress = true;
@@ -194,6 +231,7 @@ module.exports = GameView;
 /* 2 */
 /***/ (function(module, exports) {
 
+/* Handles collision detection, absorbing, drawing, and bounds of cells. */
 function MovingObject(pos, vel, radius, color, game){
   this.pos = pos;
   this.vel = vel;
@@ -407,10 +445,9 @@ el.addEventListener("keydown", function() {
         removeMenu();
 		gameView.start(ctx);
 	} else if (event.which === 77 && !gameView.inProgress) {
-        //player wants to run a multiplayer game, register websockets here
+        //player wants to run a multiplayer game, pass along boolean
         removeMenu();
-        registerWebsocket();
-        gameView.start(ctx);
+        gameView.start(ctx, true);
     }
 });
 
@@ -423,24 +460,6 @@ function removeMenu() {
     toolTip.className = "gone"
 }
 
-function registerWebsocket() {
-    var connection = new WebSocket('ws://localhost:8080');
-
-    connection.onopen = function () {
-      console.log("opened");
-    };
-
-    // Log errors
-    connection.onerror = function (error) {
-      console.error('WebSocket Error ' + error);
-    };
-
-    // Log messages from the server
-    connection.onmessage = function (e) {
-        console.log(e.data);
-    };
-}
-
 
 /***/ }),
 /* 5 */
@@ -451,13 +470,15 @@ var Cell = __webpack_require__(6);
 var PlayerCell = __webpack_require__(3);
 var GameView = __webpack_require__(1);
 
+var util = new Util();
 var NUM_CELLS = 300;
 
-function Game(dimX, dimY){
+function Game(dimX, dimY, multiplayer){
 
   this.cells = [];
   this.dimY = dimY;
   this.dimX = dimX;
+  this.multiplayer = multiplayer;
   var playerCellPos = [(dimX / 2), (dimY / 2)]
   this.playerCell = new PlayerCell(playerCellPos, this);
 
@@ -466,6 +487,10 @@ function Game(dimX, dimY){
   }
 
   this.allObjects = [this.playerCell].concat(this.cells);
+
+  if (this.multiplayer) {
+    this.socket = util.getSocket();
+  }
 }
 
 Game.prototype.addcells = function (pos, vel, radius) {

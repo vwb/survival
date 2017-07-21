@@ -1,3 +1,4 @@
+/* Handles collision detection, absorbing, drawing, and bounds of cells. */
 function MovingObject(pos, vel, radius, color, game){
   this.pos = pos;
   this.vel = vel;

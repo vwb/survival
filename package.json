@@ -4,11 +4,11 @@
   "description": "survival game",
   "main": "bundle.js",
   "dependencies": {
-    "ws": "^3.0.0"
+    "socket.io": "^2.0.3"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "webpack ./entry.js bundle.js && node server.js",
+    "test": "webpack ./entry.js bundle.js && node multiplayer/server.js",
     "start": "node server.js"
   },
   "repository": {

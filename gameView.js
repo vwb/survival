@@ -1,3 +1,5 @@
+/* This handles creating the Game Object, set the interval to step the game every 20 ms, 
+and display correct divs once game over. */
 var Game = require('./game.js');
 
 function GameView(dimY, dimX){
@@ -7,9 +9,9 @@ function GameView(dimY, dimX){
   this.firstOpen = false;
 }
 
-GameView.prototype.start = function (ctx) {
+GameView.prototype.start = function (ctx, multiplayer = false) {
 
-  this.game = new Game(this.dimY, this.dimX);
+  this.game = new Game(this.dimY, this.dimX, multiplayer);
   this.playerCell = this.game.playerCell;
   // this.playerCell.vel = [0,0]
   this.inProgress = true;
