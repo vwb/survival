@@ -54,7 +54,16 @@ function onNewPlayer(data) {
     players.push(newPlayer);
 };
 
-function onMovePlayer(data) {};
+function onMovePlayer(data) {
+    var movePlayer = getPlayerById(this.id);
+
+    if (!movePlayer) {
+        util.log("Player not found: "+this.id);
+        return;
+    }
+    movePlayer.setPos(data.pos);
+    this.broadcast.emit(MOVE_PLAYER, {id: this.id, pos: data.pos});
+};
 
 function getPlayerById(id) {
     for (var i = 0; i < players.length; i++) {

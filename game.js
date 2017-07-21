@@ -18,6 +18,8 @@ function Game(dimX, dimY, multiplayer){
   this.cells = [];
   this.dimY = dimY;
   this.dimX = dimX;
+  this.prevX = dimX;
+  this.prevY = dimY;
   this.multiplayer = multiplayer;
   var playerCellPos = [randomIntFromInterval(EDGE_BUFFER, this.dimX-EDGE_BUFFER),
                        randomIntFromInterval(EDGE_BUFFER, this.dimY-EDGE_BUFFER)];
@@ -126,6 +128,14 @@ Game.prototype.step = function () {
   this.checkOver();
   this.moveObjects();
   this.checkCollision();
+  var x = this.playerCell.getPos()[0];
+  var y = this.playerCell.getPos()[1];
+
+  if (x != this.prevX || y != this.prevY) {
+    this.socket.emit('move player', {pos: this.playerCell.getPos()});
+  }
+  this.prevX = x;
+  this.prevY = y;
 };
 
 Game.prototype.getSocket = function () {
@@ -147,7 +157,19 @@ Game.prototype.getSocket = function () {
     });
 
     socket.on(MOVE_PLAYER, function(data) {
+      var movePlayer;
+      for (var i = 0; i < that.remotePlayers.length; i++) {
+        if (that.remotePlayers[i].id == data.id) {
+          movePlayer = that.remotePlayers[i];
+        }
+      }
 
+      if (!movePlayer) {
+        console.log("Player not found: "+ data.id);
+        return;
+      }
+
+      movePlayer.setPos(data.pos);
     });
 
     socket.on(REMOVE_PLAYER, function(data) {
@@ -165,6 +187,7 @@ Game.prototype.getSocket = function () {
 
       that.remotePlayers.splice(that.remotePlayers.indexOf(playerToRemove), 1);
     });
+    return socket;
 }
 
 function randomIntFromInterval(min, max) {
