@@ -67,12 +67,6 @@
 /* 0 */
 /***/ (function(module, exports) {
 
-const CONNECT = 'connect'; 
-const DISCONNECT = 'disconnect';
-const NEW_PLAYER = 'new player';
-const MOVE_PLAYER = 'move player';
-const REMOVE_PLAYER = 'remove player';
-
 function Util(){}
 
 Util.prototype.inherits = function (SuperClass, SubClass) {
@@ -99,35 +93,6 @@ Util.prototype.randomVec = function (length) {
 	}
 
   return [x,y];
-};
-
-Util.prototype.getSocket = function () {
-    var socket = io.connect('http://localhost:8080');
-    socket.on(CONNECT, onSocketConnected);
-    socket.on(DISCONNECT, onSocketDisconnect);
-    socket.on(NEW_PLAYER, onNewPlayer);
-    socket.on(MOVE_PLAYER, onMovePlayer);
-    socket.on(REMOVE_PLAYER, onRemovePlayer);
-}
-
-function onSocketConnected() {
-    console.log("Connected to socket server");
-};
-
-function onSocketDisconnect() {
-    console.log("Disconnected from socket server");
-};
-
-function onNewPlayer(data) {
-    console.log("New player connected: " + data.id);
-};
-
-function onMovePlayer(data) {
-
-};
-
-function onRemovePlayer(data) {
-
 };
 
 module.exports = Util;
@@ -362,10 +327,26 @@ var VEL = [0,0];
 function PlayerCell(pos, game){
 	var vel = util.randomVec((Math.random() * 0.1))
   MovingObject.call(this, pos, vel, RADIUS, COLOR, game);
+  var id;
 }
 
 util.inherits(MovingObject, PlayerCell);
 
+PlayerCell.prototype.getId = function () {
+    return this.id;
+};
+
+PlayerCell.prototype.setId = function(id) {
+    this.id = id;
+};
+
+PlayerCell.prototype.getPos = function() {
+    return this.pos;
+};
+
+PlayerCell.prototype.setPos = function(pos) {
+    this.pos = pos;
+};
 
 PlayerCell.prototype.power = function (impulse) {
 
@@ -470,8 +451,15 @@ var Cell = __webpack_require__(6);
 var PlayerCell = __webpack_require__(3);
 var GameView = __webpack_require__(1);
 
+const CONNECT = 'connect';
+const DISCONNECT = 'disconnect';
+const NEW_PLAYER = 'new player';
+const MOVE_PLAYER = 'move player';
+const REMOVE_PLAYER = 'remove player';
+
 var util = new Util();
 var NUM_CELLS = 300;
+const EDGE_BUFFER = 50;
 
 function Game(dimX, dimY, multiplayer){
 
@@ -479,8 +467,10 @@ function Game(dimX, dimY, multiplayer){
   this.dimY = dimY;
   this.dimX = dimX;
   this.multiplayer = multiplayer;
-  var playerCellPos = [(dimX / 2), (dimY / 2)]
+  var playerCellPos = [randomIntFromInterval(EDGE_BUFFER, this.dimX-EDGE_BUFFER),
+                       randomIntFromInterval(EDGE_BUFFER, this.dimY-EDGE_BUFFER)];
   this.playerCell = new PlayerCell(playerCellPos, this);
+  this.remotePlayers = [];
 
   for (var i = 0; i < NUM_CELLS; i++) {
     this.addcells();
@@ -489,7 +479,7 @@ function Game(dimX, dimY, multiplayer){
   this.allObjects = [this.playerCell].concat(this.cells);
 
   if (this.multiplayer) {
-    this.socket = util.getSocket();
+    this.socket = this.getSocket();
   }
 }
 
@@ -527,6 +517,9 @@ Game.prototype.draw = function (ctx) {
     object.draw(ctx);
   });
 
+  this.remotePlayers.forEach(function (object) {
+    object.draw(ctx);
+  });
 };
 
 Game.prototype.on = function() {
@@ -577,14 +570,46 @@ Game.prototype.checkOver = function() {
 
 };
 
-
 Game.prototype.step = function () {
   this.checkOver();
   this.moveObjects();
   this.checkCollision();
 };
 
+Game.prototype.getSocket = function () {
+    var socket = io.connect('http://localhost:8080');
+    var that = this;
+
+    socket.on(CONNECT, function() {
+      socket.emit('new player', {pos: that.playerCell.getPos()});
+    });
+
+    socket.on(DISCONNECT, function() {
+
+    });
+
+    socket.on(NEW_PLAYER, function(data) {
+      var newPlayer = new PlayerCell(data.pos, this);
+      newPlayer.setId(data.id);
+      that.remotePlayers.push(newPlayer);
+      console.log(that.remotePlayers);
+    });
+
+    socket.on(MOVE_PLAYER, function(data) {
+
+    });
+
+    socket.on(REMOVE_PLAYER, function(data) {
+
+    });
+}
+
+function randomIntFromInterval(min, max) {
+    return Math.floor(Math.random()*(max-min+1)+min);
+};
+
 module.exports = Game;
+
 
 /***/ }),
 /* 6 */

@@ -9,10 +9,26 @@ var VEL = [0,0];
 function PlayerCell(pos, game){
 	var vel = util.randomVec((Math.random() * 0.1))
   MovingObject.call(this, pos, vel, RADIUS, COLOR, game);
+  var id;
 }
 
 util.inherits(MovingObject, PlayerCell);
 
+PlayerCell.prototype.getId = function () {
+    return this.id;
+};
+
+PlayerCell.prototype.setId = function(id) {
+    this.id = id;
+};
+
+PlayerCell.prototype.getPos = function() {
+    return this.pos;
+};
+
+PlayerCell.prototype.setPos = function(pos) {
+    this.pos = pos;
+};
 
 PlayerCell.prototype.power = function (impulse) {
 

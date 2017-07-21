@@ -1,7 +1,7 @@
 var app = require('http').createServer()
 var io = require('socket.io')(app);
 const util = require('util');
-const ServerPlayer = require('./serverPlayer.js');
+const ServerPlayer = require('./serverPlayer.js').ServerPlayer;
 
 const CONNECTION = 'connection';
 const NEW_PLAYER = 'new player';
@@ -11,7 +11,8 @@ const MOVE_PLAYER = 'move player';
 var players = [];
 
 app.listen(8080);
-app.on(CONNECTION, onSocketConnection);
+
+io.on(CONNECTION, onSocketConnection);
 
 function onSocketConnection(client) {
     util.log("Hey we got a connection from: " + client.id);
@@ -27,6 +28,7 @@ function onClientDisconnect() {
 };
 
 function onNewPlayer(data) {
+    util.log("New player located at: " + data.pos);
     var newPlayer = new ServerPlayer(data.pos);
     newPlayer.id = this.id;
 
