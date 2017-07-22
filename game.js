@@ -117,8 +117,10 @@ Game.prototype.checkOver = function() {
 
 
   if (this.allObjects.indexOf(this.playerCell) === -1){
+    this.socket.disconnect();
     return ("player_loss")
   } else if (this.allObjects.length === 1 && this.allObjects.indexOf(this.playerCell) > -1){
+    this.socket.disconnect();
     return ("player_win")
   }
 
@@ -128,6 +130,7 @@ Game.prototype.step = function () {
   this.checkOver();
   this.moveObjects();
   this.checkCollision();
+
   var x = this.playerCell.getPos()[0];
   var y = this.playerCell.getPos()[1];
 
@@ -144,10 +147,6 @@ Game.prototype.getSocket = function () {
 
     socket.on(CONNECT, function() {
       socket.emit('new player', {pos: that.playerCell.getPos()});
-    });
-
-    socket.on(DISCONNECT, function() {
-
     });
 
     socket.on(NEW_PLAYER, function(data) {
@@ -193,7 +192,5 @@ Game.prototype.getSocket = function () {
 function randomIntFromInterval(min, max) {
     return Math.floor(Math.random()*(max-min+1)+min);
 };
-
-
 
 module.exports = Game;
