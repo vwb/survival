@@ -7,6 +7,7 @@ const CONNECTION = 'connection';
 const NEW_PLAYER = 'new player';
 const DISCONNECT = 'disconnect';
 const MOVE_PLAYER = 'move player';
+const RESIZE_PLAYER = 'resize player';
 const REMOVE_PLAYER = 'remove player';
 
 var players = [];
@@ -21,8 +22,19 @@ function onSocketConnection(client) {
     client.on(DISCONNECT, onClientDisconnect);
     client.on(NEW_PLAYER, onNewPlayer);
     client.on(MOVE_PLAYER, onMovePlayer);
+    client.on(RESIZE_PLAYER, onResizePlayer);
 };
 
+function onResizePlayer(data) {
+    var resizePlayer = getPlayerById(this.id);
+
+    if (!resizePlayer) {
+        util.log("Player not found: " + this.id);
+        return;
+    }
+    resizePlayer.setRadius(data.radius);
+    this.broadcast.emit(RESIZE_PLAYER, {id: this.id, radius: data.radius});
+};
 
 function onClientDisconnect() {
     util.log("Aw player has disconnected: " + this.id);

@@ -30,6 +30,14 @@ PlayerCell.prototype.setPos = function(pos) {
     this.pos = pos;
 };
 
+PlayerCell.prototype.getRadius = function() {
+  return this.radius;
+};
+
+PlayerCell.prototype.setRadius = function(radius) {
+  this.radius = radius;
+};
+
 PlayerCell.prototype.power = function (impulse) {
 
   this.vel[0] += impulse[0];

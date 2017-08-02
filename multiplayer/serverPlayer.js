@@ -18,9 +18,19 @@ var ServerPlayer = function(startPos) {
         pos = newPos;
     };
 
+    var getRadius = function() {
+        return radius;
+    };
+
+    var setRadius = function(newRadius) {
+        radius = newRadius;
+    };
+
     return {
         getPos: getPos,
         setPos: setPos,
+        getRadius: getRadius,
+        setRadius: setRadius,
         id: id
     }
 };

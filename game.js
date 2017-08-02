@@ -8,6 +8,7 @@ const DISCONNECT = 'disconnect';
 const NEW_PLAYER = 'new player';
 const MOVE_PLAYER = 'move player';
 const REMOVE_PLAYER = 'remove player';
+const RESIZE_PLAYER = 'resize player';
 
 var util = new Util();
 var NUM_CELLS = 300;
@@ -95,12 +96,16 @@ Game.prototype.checkCollision = function () {
   this.allObjects.forEach(function (cell, index) {
     var k = 0;
     for (var i = index + 1; k < that.allObjects.length - 1; i++) {
-      i = i % that.allObjects.length;
+      i = i % that.allObjects.length; // this is so it wraps to check all values in array
       var result = cell.isCollidedWith(that.allObjects[i]);
       if (result) {
         cell.collidedWith(that.allObjects[i]);
       }
       k++;
+    }
+    //emit new cell size (eventually will also have to do that.allObject[i])
+    if (that.multiplayer && cell == that.playerCell) {
+      that.socket.emit('resize player', {radius: cell.getRadius()});
     }
   });
 };
@@ -134,7 +139,7 @@ Game.prototype.step = function () {
   var x = this.playerCell.getPos()[0];
   var y = this.playerCell.getPos()[1];
 
-  if (x != this.prevX || y != this.prevY) {
+  if (this.multiplayer && (x != this.prevX || y != this.prevY)) {
     this.socket.emit('move player', {pos: this.playerCell.getPos()});
   }
   this.prevX = x;
@@ -185,6 +190,22 @@ Game.prototype.getSocket = function () {
       }
 
       that.remotePlayers.splice(that.remotePlayers.indexOf(playerToRemove), 1);
+    });
+
+    socket.on(RESIZE_PLAYER, function(data) {
+        var resizePlayer;
+        for (var i = 0; i < that.remotePlayers.length; i++) {
+          if (that.remotePlayers[i].id == data.id) {
+            resizePlayer = that.remotePlayers[i];
+          }
+        }
+
+        if (!resizePlayer) {
+          console.log("Player not found: " + data.id);
+          return;
+        }
+
+        resizePlayer.setRadius(data.radius);
     });
     return socket;
 }
