@@ -475,8 +475,6 @@ function Game(dimX, dimY, multiplayer){
   this.cells = [];
   this.dimY = dimY;
   this.dimX = dimX;
-  this.prevX = dimX;
-  this.prevY = dimY;
   this.multiplayer = multiplayer;
   var playerCellPos = [randomIntFromInterval(EDGE_BUFFER, this.dimX-EDGE_BUFFER),
                        randomIntFromInterval(EDGE_BUFFER, this.dimY-EDGE_BUFFER)];
@@ -561,7 +559,6 @@ Game.prototype.checkCollision = function () {
     }
     //emit new cell size (eventually will also have to do that.allObject[i])
     if (that.multiplayer && cell == that.playerCell) {
-      console.log("hello");
       that.socket.emit('resize player', {radius: cell.getRadius()});
     }
   });
@@ -596,11 +593,9 @@ Game.prototype.step = function () {
   var x = this.playerCell.getPos()[0];
   var y = this.playerCell.getPos()[1];
 
-  if (this.multiplayer && (x != this.prevX || y != this.prevY)) {
+  if (this.multiplayer) {
     this.socket.emit('move player', {pos: this.playerCell.getPos()});
   }
-  this.prevX = x;
-  this.prevY = y;
 };
 
 Game.prototype.getSocket = function () {
