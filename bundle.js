@@ -128,10 +128,8 @@ GameView.prototype.start = function (ctx, multiplayer = false) {
   this.bindKeyHandlers();
 
   this.var = setInterval(function(){
-    that.game.step();
-    that.game.draw(ctx);
-    that.isOver();
-
+    that.game.step(ctx);
+    // that.isOver();
   }, 20);
 
 };
@@ -184,7 +182,9 @@ GameView.prototype.bindKeyHandlers = function () {
 
   Object.keys(GameView.MOVES).forEach(function (k) {
     var move = GameView.MOVES[k];
-    key(k, function () { playerCell.power(move); console.log("this is the move"+move)});
+    key(k, function() { 
+      playerCell.power(move); 
+    });
   });
 
 };
@@ -465,6 +465,7 @@ const NEW_PLAYER = 'new player';
 const MOVE_PLAYER = 'move player';
 const REMOVE_PLAYER = 'remove player';
 const RESIZE_PLAYER = 'resize player';
+const STEP_CELLS = 'step cells';
 
 var util = new Util();
 var NUM_CELLS = 300;
@@ -481,8 +482,10 @@ function Game(dimX, dimY, multiplayer){
   this.playerCell = new PlayerCell(playerCellPos, this);
   this.remotePlayers = [];
 
-  for (var i = 0; i < NUM_CELLS; i++) {
-    this.addcells();
+  if (!this.multiplayer) {
+    for (var i = 0; i < NUM_CELLS; i++) {
+      this.addcells();
+    }
   }
 
   this.allObjects = [this.playerCell].concat(this.cells);
@@ -518,16 +521,32 @@ Game.prototype.renderCell = function(cell) {
   this.allObjects.push(newCell)
 };
 
+function draw(ctx, cell) {
+  ctx.fillStyle = cell.color;
+  ctx.beginPath();
+
+   ctx.arc(
+     cell.pos[0],
+     cell.pos[1],
+     cell.radius,
+     0,
+     2 * Math.PI,
+     false
+   );
+
+   ctx.fill();
+}
+
 Game.prototype.draw = function (ctx) {
 
   ctx.clearRect(0, 0, this.dimX, this.dimY);
 
   this.allObjects.forEach(function (object) {
-    object.draw(ctx);
+    draw(ctx, object);
   });
 
   this.remotePlayers.forEach(function (object) {
-    object.draw(ctx);
+    draw(ctx, object);
   });
 };
 
@@ -543,6 +562,10 @@ Game.prototype.moveObjects = function () {
   this.allObjects.forEach(function (object) {
     object.move();
   });
+};
+
+Game.prototype.movePlayer = function() {
+  this.playerCell.move();
 };
 
 Game.prototype.checkCollision = function () {
@@ -562,6 +585,12 @@ Game.prototype.checkCollision = function () {
       that.socket.emit('resize player', {radius: cell.getRadius()});
     }
   });
+};
+
+Game.prototype.checkPlayerCollision = function() {
+  //fill this in to just check player collision and update. 
+  // I actually think this should just be done server side. Client is ONLY going to be drawing stuff
+  // and updating player location via keypresses. 
 };
 
 Game.prototype.remove = function (object) {
@@ -585,16 +614,17 @@ Game.prototype.checkOver = function() {
 
 };
 
-Game.prototype.step = function () {
-  this.checkOver();
-  this.moveObjects();
-  this.checkCollision();
-
-  var x = this.playerCell.getPos()[0];
-  var y = this.playerCell.getPos()[1];
-
+Game.prototype.step = function (ctx) {
   if (this.multiplayer) {
+    this.movePlayer();
     this.socket.emit('move player', {pos: this.playerCell.getPos()});
+    this.socket.emit('resize player', {radius: this.playerCell.getRadius()});
+    this.socket.emit('step cells')
+    this.draw(ctx)
+  } else {
+    this.checkOver();
+    this.moveObjects();
+    this.checkCollision();
   }
 };
 
@@ -645,6 +675,7 @@ Game.prototype.getSocket = function () {
     });
 
     socket.on(RESIZE_PLAYER, function(data) {
+        console.log("calling this")
         var resizePlayer;
         for (var i = 0; i < that.remotePlayers.length; i++) {
           if (that.remotePlayers[i].id == data.id) {
@@ -659,6 +690,11 @@ Game.prototype.getSocket = function () {
 
         resizePlayer.setRadius(data.radius);
     });
+
+    socket.on(STEP_CELLS, function(data) {
+      that.allObjects = [that.playerCell].concat(data.cells);
+    });
+
     return socket;
 }
 

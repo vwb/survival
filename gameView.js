@@ -25,8 +25,7 @@ GameView.prototype.start = function (ctx, multiplayer = false) {
 
   this.var = setInterval(function(){
     that.game.step(ctx);
-    that.isOver();
-
+    // that.isOver();
   }, 20);
 
 };
@@ -79,7 +78,9 @@ GameView.prototype.bindKeyHandlers = function () {
 
   Object.keys(GameView.MOVES).forEach(function (k) {
     var move = GameView.MOVES[k];
-    key(k, function () { playerCell.power(move); console.log("this is the move"+move)});
+    key(k, function() { 
+      playerCell.power(move); 
+    });
   });
 
 };

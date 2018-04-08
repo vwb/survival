@@ -9,6 +9,7 @@ const NEW_PLAYER = 'new player';
 const MOVE_PLAYER = 'move player';
 const REMOVE_PLAYER = 'remove player';
 const RESIZE_PLAYER = 'resize player';
+const STEP_CELLS = 'step cells';
 
 var util = new Util();
 var NUM_CELLS = 300;
@@ -30,7 +31,7 @@ function Game(dimX, dimY, multiplayer){
       this.addcells();
     }
   }
-  
+
   this.allObjects = [this.playerCell].concat(this.cells);
 
   if (this.multiplayer) {
@@ -157,10 +158,12 @@ Game.prototype.checkOver = function() {
 
 };
 
-Game.prototype.step = function () {
+Game.prototype.step = function (ctx) {
   if (this.multiplayer) {
     this.movePlayer();
     this.socket.emit('move player', {pos: this.playerCell.getPos()});
+    this.socket.emit('resize player', {radius: this.playerCell.getRadius()});
+    this.socket.emit('step cells')
     this.draw(ctx)
   } else {
     this.checkOver();
@@ -216,6 +219,7 @@ Game.prototype.getSocket = function () {
     });
 
     socket.on(RESIZE_PLAYER, function(data) {
+        console.log("calling this")
         var resizePlayer;
         for (var i = 0; i < that.remotePlayers.length; i++) {
           if (that.remotePlayers[i].id == data.id) {
@@ -231,7 +235,7 @@ Game.prototype.getSocket = function () {
         resizePlayer.setRadius(data.radius);
     });
 
-    socket.on('update cells', function(data) {
+    socket.on(STEP_CELLS, function(data) {
       that.allObjects = [that.playerCell].concat(data.cells);
     });
 
