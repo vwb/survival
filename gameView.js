@@ -24,8 +24,7 @@ GameView.prototype.start = function (ctx, multiplayer = false) {
   this.bindKeyHandlers();
 
   this.var = setInterval(function(){
-    that.game.step();
-    that.game.draw(ctx);
+    that.game.step(ctx);
     that.isOver();
 
   }, 20);
