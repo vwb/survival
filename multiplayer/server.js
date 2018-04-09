@@ -11,6 +11,7 @@ const MOVE_PLAYER = 'move player';
 const RESIZE_PLAYER = 'resize player';
 const REMOVE_PLAYER = 'remove player';
 const STEP_CELLS = 'step cells'
+const ADD_CELL = 'add cell';
 const NUM_CELLS = 50;
 
 var players = [];
@@ -19,8 +20,6 @@ var dimX = 800;
 var dimY = 600;
 var inProgress = false;
 var lock;
-
-init();
 
 app.listen(8080);
 
@@ -33,6 +32,7 @@ function onSocketConnection(client) {
     client.on(MOVE_PLAYER, onMovePlayer);
     client.on(RESIZE_PLAYER, onResizePlayer);
     client.on(STEP_CELLS, onStepCells);
+    client.on(ADD_CELL, onAddCell);
     if (!inProgress) {
         inProgress = true;
         runGame();
@@ -125,6 +125,11 @@ function onMovePlayer(data) {
 
 function onStepCells() {
     this.emit(STEP_CELLS, {cells: cells})
+}
+
+function onAddCell(data) {
+    var newCell = new Cell(data.pos, data.radius, data.vec);
+    cells.push(newCell);
 }
 
 function getPlayerById(id) {

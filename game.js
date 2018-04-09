@@ -61,8 +61,7 @@ Game.prototype.randomPosition = function () {
 };
 
 Game.prototype.renderCell = function(cell) {
-  var newCell = new Cell(cell.pos, this, cell.radius, cell.vel)
-  this.allObjects.push(newCell)
+  this.socket.emit('add cell', {pos: newCell.pos, radius: newCell.raidus, vec: newCell.vec});
 };
 
 function draw(ctx, cell) {
@@ -108,9 +107,13 @@ Game.prototype.moveObjects = function () {
   });
 };
 
+Game.prototype.powerPlayer = function(move) {
+  this.playerCell.power(move);
+};
+
 Game.prototype.movePlayer = function() {
   this.playerCell.move();
-};
+}
 
 Game.prototype.checkCollision = function () {
   var that = this;
@@ -146,7 +149,6 @@ Game.prototype.remove = function (object) {
 };
 
 Game.prototype.checkOver = function() {
-
 
   if (this.allObjects.indexOf(this.playerCell) === -1){
     this.socket.disconnect();

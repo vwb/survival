@@ -75,11 +75,12 @@ GameView.MOVES = {
 
 GameView.prototype.bindKeyHandlers = function () {
   var playerCell = this.playerCell;
+  var thatGame = this.game;
 
   Object.keys(GameView.MOVES).forEach(function (k) {
     var move = GameView.MOVES[k];
     key(k, function() { 
-      playerCell.power(move); 
+      thatGame.powerPlayer(move); 
     });
   });
 

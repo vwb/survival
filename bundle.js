@@ -179,11 +179,12 @@ GameView.MOVES = {
 
 GameView.prototype.bindKeyHandlers = function () {
   var playerCell = this.playerCell;
+  var thatGame = this.game;
 
   Object.keys(GameView.MOVES).forEach(function (k) {
     var move = GameView.MOVES[k];
     key(k, function() { 
-      playerCell.power(move); 
+      thatGame.powerPlayer(move); 
     });
   });
 
@@ -518,6 +519,7 @@ Game.prototype.randomPosition = function () {
 
 Game.prototype.renderCell = function(cell) {
   var newCell = new Cell(cell.pos, this, cell.radius, cell.vel)
+  this.socket.emit('add cell', {pos: newCell.pos, radius: newCell.raidus, vec: newCell.vec});
   this.allObjects.push(newCell)
 };
 
@@ -564,9 +566,13 @@ Game.prototype.moveObjects = function () {
   });
 };
 
+Game.prototype.powerPlayer = function(move) {
+  this.playerCell.power(move);
+};
+
 Game.prototype.movePlayer = function() {
   this.playerCell.move();
-};
+}
 
 Game.prototype.checkCollision = function () {
   var that = this;
@@ -602,7 +608,6 @@ Game.prototype.remove = function (object) {
 };
 
 Game.prototype.checkOver = function() {
-
 
   if (this.allObjects.indexOf(this.playerCell) === -1){
     this.socket.disconnect();
