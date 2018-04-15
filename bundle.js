@@ -114,10 +114,8 @@ function GameView(dimY, dimX){
 }
 
 GameView.prototype.start = function (ctx, multiplayer = false) {
-
   this.game = new Game(this.dimY, this.dimX, multiplayer);
   this.playerCell = this.game.playerCell;
-  // this.playerCell.vel = [0,0]
   this.inProgress = true;
 
   if (this.var){
@@ -129,7 +127,7 @@ GameView.prototype.start = function (ctx, multiplayer = false) {
 
   this.var = setInterval(function(){
     that.game.step(ctx);
-    // that.isOver();
+    // that.isOver(); put this back in when you actually want to play the game
   }, 20);
 
 };
@@ -142,8 +140,6 @@ GameView.prototype.isOver = function() {
   var winEl = document.getElementById("win-game")
   var lossEl = document.getElementById("lost-game")
 
-
-
   if (result === "player_loss"){
     this.inProgress = false;
 
@@ -152,8 +148,6 @@ GameView.prototype.isOver = function() {
     lossEl.className = "info fade-in"
     canvas.className = "transparent"
 
-    
-
   } else if (result === "player_win"){
     this.inProgress = false;
 
@@ -161,9 +155,7 @@ GameView.prototype.isOver = function() {
     lossEl.className = "info gone"
     winEl.className = "info fade-in"
     canvas.className = "transparent"
-
   }
-
 };
 
 GameView.MOVES = {
@@ -187,7 +179,6 @@ GameView.prototype.bindKeyHandlers = function () {
       thatGame.powerPlayer(move); 
     });
   });
-
 };
 
 module.exports = GameView;
@@ -371,9 +362,6 @@ PlayerCell.prototype.power = function (impulse) {
   	radius: saveRadius/20,
   	vel: cellV
   }
-
-
-
   this.game.renderCell(cellOptions);
 };
 
@@ -496,6 +484,15 @@ function Game(dimX, dimY, multiplayer){
   }
 }
 
+Game.prototype.step = function (ctx) {
+    // this.checkOver();
+    this.movePlayer();
+    this.socket.emit('move player', {pos: this.playerCell.getPos()});
+    this.socket.emit('resize player', {radius: this.playerCell.getRadius()});
+    this.socket.emit('step cells')
+    this.draw(ctx)
+};
+
 Game.prototype.addcells = function (pos, vel, radius) {
 
   if (!pos){ 
@@ -518,9 +515,7 @@ Game.prototype.randomPosition = function () {
 };
 
 Game.prototype.renderCell = function(cell) {
-  var newCell = new Cell(cell.pos, this, cell.radius, cell.vel)
-  this.socket.emit('add cell', {pos: newCell.pos, radius: newCell.raidus, vec: newCell.vec});
-  this.allObjects.push(newCell)
+  this.socket.emit('add cell', {pos: cell.pos, radius: cell.radius, vec: cell.vec});
 };
 
 function draw(ctx, cell) {
@@ -574,25 +569,6 @@ Game.prototype.movePlayer = function() {
   this.playerCell.move();
 }
 
-Game.prototype.checkCollision = function () {
-  var that = this;
-  this.allObjects.forEach(function (cell, index) {
-    var k = 0;
-    for (var i = index + 1; k < that.allObjects.length - 1; i++) {
-      i = i % that.allObjects.length; // this is so it wraps to check all values in array
-      var result = cell.isCollidedWith(that.allObjects[i]);
-      if (result) {
-        cell.collidedWith(that.allObjects[i]);
-      }
-      k++;
-    }
-    //emit new cell size (eventually will also have to do that.allObject[i])
-    if (that.multiplayer && cell == that.playerCell) {
-      that.socket.emit('resize player', {radius: cell.getRadius()});
-    }
-  });
-};
-
 Game.prototype.checkPlayerCollision = function() {
   //fill this in to just check player collision and update. 
   // I actually think this should just be done server side. Client is ONLY going to be drawing stuff
@@ -608,7 +584,6 @@ Game.prototype.remove = function (object) {
 };
 
 Game.prototype.checkOver = function() {
-
   if (this.allObjects.indexOf(this.playerCell) === -1){
     this.socket.disconnect();
     return ("player_loss")
@@ -617,20 +592,6 @@ Game.prototype.checkOver = function() {
     return ("player_win")
   }
 
-};
-
-Game.prototype.step = function (ctx) {
-  if (this.multiplayer) {
-    this.movePlayer();
-    this.socket.emit('move player', {pos: this.playerCell.getPos()});
-    this.socket.emit('resize player', {radius: this.playerCell.getRadius()});
-    this.socket.emit('step cells')
-    this.draw(ctx)
-  } else {
-    this.checkOver();
-    this.moveObjects();
-    this.checkCollision();
-  }
 };
 
 Game.prototype.getSocket = function () {
@@ -680,7 +641,6 @@ Game.prototype.getSocket = function () {
     });
 
     socket.on(RESIZE_PLAYER, function(data) {
-        console.log("calling this")
         var resizePlayer;
         for (var i = 0; i < that.remotePlayers.length; i++) {
           if (that.remotePlayers[i].id == data.id) {

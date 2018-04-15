@@ -12,7 +12,7 @@ const RESIZE_PLAYER = 'resize player';
 const REMOVE_PLAYER = 'remove player';
 const STEP_CELLS = 'step cells'
 const ADD_CELL = 'add cell';
-const NUM_CELLS = 50;
+const NUM_CELLS = 100;
 
 var players = [];
 var cells = [];
@@ -52,6 +52,7 @@ function runGame() {
     lock = setInterval( function() {
         cells.forEach(function (object) {
             object.move();
+            checkCollision();
         });
     }, 20);
 }
@@ -70,6 +71,35 @@ function randomPosition() {
   }
   return [x,y];
 };
+function checkCollision() {
+    allObjects = players.concat(cells);
+    allObjects.forEach(function (cell, index) {
+        var k = 0;
+        for (var i = index + 1; k < allObjects.length - 1; i++) {
+            i = i % allObjects.length; // this is so it wraps to check all values in array
+            var result = cell.isCollidedWith(allObjects[i]);
+            if (result) {
+                removed = cell.collidedWith(allObjects[i]);
+                if (removed) {
+                    var idx = players.indexOf(removed);
+                    if (idx > -1) {
+                        players.splice(idx, 1);
+                        // removePlayer(removed.id);
+                        // this.broadcast.emit(REMOVE_PLAYER, {id: this.id});
+                    } else {
+                        idx = cells.indexOf(removed);
+                        cells.splice(idx, 1);
+                    }
+                }
+            }
+            k++;
+        }
+    });
+};
+
+function removePlayer(id) {
+    // var playerToRemove()
+}
 
 function onResizePlayer(data) {
     var resizePlayer = getPlayerById(this.id);

@@ -82,7 +82,7 @@ MovingObject.prototype.collidedWith = function (other) {
     other.radius -= ratio
 
     if (other.radius <= 1){
-      // this.game.remove(other)
+      return other; //remove other
     }
 
   } else {
@@ -91,7 +91,7 @@ MovingObject.prototype.collidedWith = function (other) {
 
 
     if (this.radius <= 1){
-      // this.game.remove(this)
+      return this; //remove this one
     } 
   }
 

@@ -10,10 +10,8 @@ function GameView(dimY, dimX){
 }
 
 GameView.prototype.start = function (ctx, multiplayer = false) {
-
   this.game = new Game(this.dimY, this.dimX, multiplayer);
   this.playerCell = this.game.playerCell;
-  // this.playerCell.vel = [0,0]
   this.inProgress = true;
 
   if (this.var){
@@ -25,7 +23,7 @@ GameView.prototype.start = function (ctx, multiplayer = false) {
 
   this.var = setInterval(function(){
     that.game.step(ctx);
-    // that.isOver();
+    // that.isOver(); put this back in when you actually want to play the game
   }, 20);
 
 };
@@ -38,8 +36,6 @@ GameView.prototype.isOver = function() {
   var winEl = document.getElementById("win-game")
   var lossEl = document.getElementById("lost-game")
 
-
-
   if (result === "player_loss"){
     this.inProgress = false;
 
@@ -48,8 +44,6 @@ GameView.prototype.isOver = function() {
     lossEl.className = "info fade-in"
     canvas.className = "transparent"
 
-    
-
   } else if (result === "player_win"){
     this.inProgress = false;
 
@@ -57,9 +51,7 @@ GameView.prototype.isOver = function() {
     lossEl.className = "info gone"
     winEl.className = "info fade-in"
     canvas.className = "transparent"
-
   }
-
 };
 
 GameView.MOVES = {
@@ -83,7 +75,6 @@ GameView.prototype.bindKeyHandlers = function () {
       thatGame.powerPlayer(move); 
     });
   });
-
 };
 
 module.exports = GameView;

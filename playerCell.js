@@ -52,9 +52,6 @@ PlayerCell.prototype.power = function (impulse) {
   	radius: saveRadius/20,
   	vel: cellV
   }
-
-
-
   this.game.renderCell(cellOptions);
 };
 

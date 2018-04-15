@@ -1,38 +1,41 @@
 /* A server side player class used for keeping track of existing players. */
+var MovingObject = require('./movingObject.js');
+var Util = require('./utils.js');
+var util = new Util();
+
 var RADIUS = 7.5;
 var VEL = [0,0];
 var COLOR = "#5BD9ED";
 
-var ServerPlayer = function(startPos) {
-    var pos = startPos,
-        velocity = VEL,
-        radius = RADIUS,
-        color = COLOR,
-        id;
-    
-    var getPos = function() {
-        return pos;
-    };
+function ServerPlayer(startPos) {
+    MovingObject.call(this, startPos, VEL, RADIUS, COLOR);
+    var id;
+}
 
-    var setPos = function(newPos) {
-        pos = newPos;
-    };
+util.inherits(MovingObject, ServerPlayer);
 
-    var getRadius = function() {
-        return radius;
-    };
+ServerPlayer.prototype.getId = function () {
+    return this.id;
+};
 
-    var setRadius = function(newRadius) {
-        radius = newRadius;
-    };
+ServerPlayer.prototype.setId = function(id) {
+    this.id = id;
+};
 
-    return {
-        getPos: getPos,
-        setPos: setPos,
-        getRadius: getRadius,
-        setRadius: setRadius,
-        id: id
-    }
+ServerPlayer.prototype.getPos = function() {
+    return this.pos;
+};
+
+ServerPlayer.prototype.setPos = function(pos) {
+    this.pos = pos;
+};
+
+ServerPlayer.prototype.getRadius = function() {
+  return this.radius;
+};
+
+ServerPlayer.prototype.setRadius = function(radius) {
+  this.radius = radius;
 };
 
 exports.ServerPlayer = ServerPlayer;
