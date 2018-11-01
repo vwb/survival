@@ -1,3 +1,5 @@
+/* This handles creating the Game Object, set the interval to step the game every 20 ms, 
+and display correct divs once game over. */
 var Game = require('./game.js');
 
 function GameView(dimY, dimX){
@@ -7,11 +9,9 @@ function GameView(dimY, dimX){
   this.firstOpen = false;
 }
 
-GameView.prototype.start = function (ctx) {
-
-  this.game = new Game(this.dimY, this.dimX);
+GameView.prototype.start = function (ctx, multiplayer = false) {
+  this.game = new Game(this.dimY, this.dimX, multiplayer);
   this.playerCell = this.game.playerCell;
-  // this.playerCell.vel = [0,0]
   this.inProgress = true;
 
   if (this.var){
@@ -22,10 +22,8 @@ GameView.prototype.start = function (ctx) {
   this.bindKeyHandlers();
 
   this.var = setInterval(function(){
-    that.game.step();
-    that.game.draw(ctx);
-    that.isOver();
-
+    that.game.step(ctx);
+    // that.isOver(); put this back in when you actually want to play the game
   }, 20);
 
 };
@@ -38,8 +36,6 @@ GameView.prototype.isOver = function() {
   var winEl = document.getElementById("win-game")
   var lossEl = document.getElementById("lost-game")
 
-
-
   if (result === "player_loss"){
     this.inProgress = false;
 
@@ -48,8 +44,6 @@ GameView.prototype.isOver = function() {
     lossEl.className = "info fade-in"
     canvas.className = "transparent"
 
-    
-
   } else if (result === "player_win"){
     this.inProgress = false;
 
@@ -57,9 +51,7 @@ GameView.prototype.isOver = function() {
     lossEl.className = "info gone"
     winEl.className = "info fade-in"
     canvas.className = "transparent"
-
   }
-
 };
 
 GameView.MOVES = {
@@ -75,12 +67,14 @@ GameView.MOVES = {
 
 GameView.prototype.bindKeyHandlers = function () {
   var playerCell = this.playerCell;
+  var thatGame = this.game;
 
   Object.keys(GameView.MOVES).forEach(function (k) {
     var move = GameView.MOVES[k];
-    key(k, function () { playerCell.power(move); console.log("this is the move"+move)});
+    key(k, function() { 
+      thatGame.powerPlayer(move); 
+    });
   });
-
 };
 
 module.exports = GameView;

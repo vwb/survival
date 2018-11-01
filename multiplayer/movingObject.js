@@ -1,10 +1,9 @@
 /* Handles collision detection, absorbing, drawing, and bounds of cells. */
-function MovingObject(pos, vel, radius, color, game){
+function MovingObject(pos, vel, radius, color){
   this.pos = pos;
   this.vel = vel;
   this.radius = radius;
   this.color = color;
-  this.game = game;
 }
 
 MovingObject.prototype.draw = function (ctx) {
@@ -61,13 +60,13 @@ MovingObject.prototype.checkOutOfBounds = function(pos) {
   if ((pos[0]-this.radius) <= 0 ){
     return {coord: "X", low: true}
 
-  } else if ((pos[0]+this.radius) >= this.game.dimX){
+  } else if ((pos[0]+this.radius) >= 800){
     return {coord: "X", low: false}
 
   } else if ((pos[1]-this.radius) <= 0){
     return {coord: "Y", low: true}
 
-  } else if ((pos[1]+this.radius) >= this.game.dimY) {
+  } else if ((pos[1]+this.radius) >= 600) {
     return {coord: "Y", low: false}
 
   } 
@@ -83,7 +82,7 @@ MovingObject.prototype.collidedWith = function (other) {
     other.radius -= ratio
 
     if (other.radius <= 1){
-      this.game.remove(other)
+      return other; //remove other
     }
 
   } else {
@@ -92,7 +91,7 @@ MovingObject.prototype.collidedWith = function (other) {
 
 
     if (this.radius <= 1){
-      this.game.remove(this)
+      return this; //remove this one
     } 
   }
 
